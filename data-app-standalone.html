@@ -388,13 +388,14 @@
             let html = '';
             filteredData.forEach(item => {
                 const date = new Date(item.timestamp).toLocaleString();
+                const escapedKey = escapeHtml(item.key);
                 html += `
                     <div class="data-item">
-                        <div class="data-item-key">${escapeHtml(item.key)}</div>
+                        <div class="data-item-key">${escapedKey}</div>
                         <div class="data-item-value">${escapeHtml(item.value)}</div>
                         <div class="data-item-meta">
                             <span>🕒 ${date}</span>
-                            <button class="delete-btn" onclick="deleteData('${escapeHtml(item.key).replace(/'/g, "\\'")}')">🗑️ Delete</button>
+                            <button class="delete-btn" data-key="${escapedKey}">🗑️ Delete</button>
                         </div>
                     </div>
                 `;
@@ -403,15 +404,18 @@
             dataList.innerHTML = html;
         }
 
-        // Delete specific data item
-        function deleteData(key) {
-            if (confirm(`Are you sure you want to delete the item with key: ${key}?`)) {
-                localStorage.removeItem('dataApp_' + key);
-                showMessage(`✅ Data with key "${key}" deleted successfully`, 'success');
-                loadAllData();
-                updateStats();
+        // Delete specific data item using event delegation
+        document.getElementById('dataList').addEventListener('click', function(e) {
+            if (e.target.classList.contains('delete-btn')) {
+                const key = e.target.getAttribute('data-key');
+                if (confirm(`Are you sure you want to delete the item with key: ${key}?`)) {
+                    localStorage.removeItem('dataApp_' + key);
+                    showMessage(`✅ Data with key "${key}" deleted successfully`, 'success');
+                    loadAllData();
+                    updateStats();
+                }
             }
-        }
+        });
 
         // Filter data based on search
         function filterData() {

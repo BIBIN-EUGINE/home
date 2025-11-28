@@ -108,6 +108,14 @@ author_profile: true
             background: #e0a800;
         }
         
+        button.export-btn {
+            background: #28a745;
+        }
+        
+        button.export-btn:hover {
+            background: #218838;
+        }
+        
         .data-item {
             background: white;
             border: 1px solid #ddd;
@@ -216,6 +224,7 @@ author_profile: true
                 </div>
                 <button type="submit">Save Data</button>
                 <button type="button" class="clear-btn" onclick="clearForm()">Clear Form</button>
+                <button type="button" class="export-btn" onclick="exportData()">Export All Data</button>
             </form>
         </div>
 
@@ -306,7 +315,8 @@ author_profile: true
             
             // Filter data based on search term
             const filteredData = allData.filter(item => 
-                item.key.toLowerCase().includes(searchTerm)
+                item.key.toLowerCase().includes(searchTerm) ||
+                item.value.toLowerCase().includes(searchTerm)
             );
             
             // Sort by timestamp (newest first)
@@ -320,13 +330,14 @@ author_profile: true
             let html = '';
             filteredData.forEach(item => {
                 const date = new Date(item.timestamp).toLocaleString();
+                const escapedKey = escapeHtml(item.key);
                 html += `
                     <div class="data-item">
-                        <div class="data-item-key">${escapeHtml(item.key)}</div>
+                        <div class="data-item-key">${escapedKey}</div>
                         <div class="data-item-value">${escapeHtml(item.value)}</div>
                         <div class="data-item-meta">
                             Saved: ${date}
-                            <button class="delete-btn" onclick="deleteData('${escapeHtml(item.key)}')">Delete</button>
+                            <button class="delete-btn" data-key="${escapedKey}">Delete</button>
                         </div>
                     </div>
                 `;
@@ -335,15 +346,18 @@ author_profile: true
             dataList.innerHTML = html;
         }
 
-        // Delete specific data item
-        function deleteData(key) {
-            if (confirm(`Are you sure you want to delete the item with key: ${key}?`)) {
-                localStorage.removeItem('dataApp_' + key);
-                showMessage(`Data with key "${key}" deleted successfully`, 'success');
-                loadAllData();
-                updateStats();
+        // Delete specific data item using event delegation
+        document.getElementById('dataList').addEventListener('click', function(e) {
+            if (e.target.classList.contains('delete-btn')) {
+                const key = e.target.getAttribute('data-key');
+                if (confirm(`Are you sure you want to delete the item with key: ${key}?`)) {
+                    localStorage.removeItem('dataApp_' + key);
+                    showMessage(`Data with key "${key}" deleted successfully`, 'success');
+                    loadAllData();
+                    updateStats();
+                }
             }
-        }
+        });
 
         // Filter data based on search
         function filterData() {
@@ -402,9 +416,18 @@ author_profile: true
             for (let i = 0; i < localStorage.length; i++) {
                 const key = localStorage.key(i);
                 if (key.startsWith('dataApp_')) {
-                    const data = JSON.parse(localStorage.getItem(key));
-                    allData.push(data);
+                    try {
+                        const data = JSON.parse(localStorage.getItem(key));
+                        allData.push(data);
+                    } catch (error) {
+                        console.error('Error exporting data for key:', key, error);
+                    }
                 }
+            }
+            
+            if (allData.length === 0) {
+                showMessage('No data to export', 'error');
+                return;
             }
             
             const dataStr = JSON.stringify(allData, null, 2);
@@ -414,6 +437,8 @@ author_profile: true
             link.href = url;
             link.download = 'data-export-' + new Date().toISOString().split('T')[0] + '.json';
             link.click();
+            
+            showMessage('Data exported successfully!', 'success');
         }
     </script>
 </body>
