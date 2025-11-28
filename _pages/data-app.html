@@ -311,7 +311,7 @@ author_profile: true
                         const data = JSON.parse(localStorage.getItem(key));
                         allData.push(data);
                     } catch (error) {
-                        console.error('Error parsing data for key:', key);
+                        console.error('Error parsing stored data item');
                     }
                 }
             }
@@ -423,7 +423,7 @@ author_profile: true
                         const data = JSON.parse(localStorage.getItem(key));
                         allData.push(data);
                     } catch (error) {
-                        console.error('Error exporting data for key:', key, error);
+                        console.error('Error exporting data item');
                     }
                 }
             }

@@ -371,7 +371,7 @@
                         const data = JSON.parse(localStorage.getItem(key));
                         allData.push(data);
                     } catch (error) {
-                        console.error('Error parsing data for key:', key);
+                        console.error('Error parsing stored data item');
                     }
                 }
             }
@@ -483,7 +483,7 @@
                         const data = JSON.parse(localStorage.getItem(key));
                         allData.push(data);
                     } catch (error) {
-                        console.error('Error exporting data:', error);
+                        console.error('Error exporting data item');
                     }
                 }
             }
