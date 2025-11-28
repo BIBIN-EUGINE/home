@@ -1,0 +1,420 @@
+---
+layout: single
+title: "Data Storage App"
+permalink: /data-app/
+author_profile: true
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        .data-app-container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+        }
+        
+        .app-section {
+            background: #f5f5f5;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .dark-theme .app-section {
+            background: #2a2a2a;
+            color: #e0e0e0;
+        }
+        
+        h2 {
+            color: #333;
+            margin-top: 0;
+        }
+        
+        .dark-theme h2 {
+            color: #e0e0e0;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        
+        .dark-theme label {
+            color: #bbb;
+        }
+        
+        input[type="text"],
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+        
+        .dark-theme input[type="text"],
+        .dark-theme textarea {
+            background: #1a1a1a;
+            border-color: #444;
+            color: #e0e0e0;
+        }
+        
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-right: 10px;
+        }
+        
+        button:hover {
+            background: #0056b3;
+        }
+        
+        button.delete-btn {
+            background: #dc3545;
+        }
+        
+        button.delete-btn:hover {
+            background: #c82333;
+        }
+        
+        button.clear-btn {
+            background: #ffc107;
+        }
+        
+        button.clear-btn:hover {
+            background: #e0a800;
+        }
+        
+        .data-item {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+            margin-bottom: 10px;
+        }
+        
+        .dark-theme .data-item {
+            background: #1a1a1a;
+            border-color: #444;
+        }
+        
+        .data-item-key {
+            font-weight: bold;
+            color: #007bff;
+            margin-bottom: 5px;
+        }
+        
+        .data-item-value {
+            color: #333;
+            word-wrap: break-word;
+        }
+        
+        .dark-theme .data-item-value {
+            color: #e0e0e0;
+        }
+        
+        .data-item-meta {
+            font-size: 12px;
+            color: #777;
+            margin-top: 8px;
+        }
+        
+        .dark-theme .data-item-meta {
+            color: #888;
+        }
+        
+        .empty-state {
+            text-align: center;
+            color: #999;
+            padding: 40px;
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 32px;
+            font-weight: bold;
+            color: #007bff;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .dark-theme .stat-label {
+            color: #aaa;
+        }
+        
+        .search-box {
+            margin-bottom: 15px;
+        }
+        
+        .message {
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+        
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <div class="data-app-container">
+        <div class="app-section">
+            <h2>📝 Store Data</h2>
+            <div id="message-container"></div>
+            <form id="dataForm">
+                <div class="form-group">
+                    <label for="dataKey">Key (Unique Identifier):</label>
+                    <input type="text" id="dataKey" name="dataKey" placeholder="e.g., myNote, user123" required>
+                </div>
+                <div class="form-group">
+                    <label for="dataValue">Value (Data to Store):</label>
+                    <textarea id="dataValue" name="dataValue" placeholder="Enter your data here..." required></textarea>
+                </div>
+                <button type="submit">Save Data</button>
+                <button type="button" class="clear-btn" onclick="clearForm()">Clear Form</button>
+            </form>
+        </div>
+
+        <div class="app-section">
+            <h2>📊 Statistics</h2>
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-number" id="totalItems">0</div>
+                    <div class="stat-label">Total Items</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number" id="storageUsed">0 KB</div>
+                    <div class="stat-label">Storage Used</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="app-section">
+            <h2>🔍 Retrieve Data</h2>
+            <div class="search-box">
+                <input type="text" id="searchKey" placeholder="Search by key..." onkeyup="filterData()">
+            </div>
+            <div id="dataList"></div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', function() {
+            loadAllData();
+            updateStats();
+        });
+
+        // Store data
+        document.getElementById('dataForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const key = document.getElementById('dataKey').value.trim();
+            const value = document.getElementById('dataValue').value.trim();
+            
+            if (!key || !value) {
+                showMessage('Please fill in both key and value fields', 'error');
+                return;
+            }
+            
+            try {
+                const dataItem = {
+                    key: key,
+                    value: value,
+                    timestamp: new Date().toISOString(),
+                    lastModified: new Date().toISOString()
+                };
+                
+                // Check if key already exists
+                const existingData = localStorage.getItem('dataApp_' + key);
+                const action = existingData ? 'updated' : 'saved';
+                
+                localStorage.setItem('dataApp_' + key, JSON.stringify(dataItem));
+                
+                showMessage(`Data ${action} successfully with key: ${key}`, 'success');
+                clearForm();
+                loadAllData();
+                updateStats();
+            } catch (error) {
+                showMessage('Error saving data: ' + error.message, 'error');
+            }
+        });
+
+        // Load and display all data
+        function loadAllData() {
+            const dataList = document.getElementById('dataList');
+            const searchTerm = document.getElementById('searchKey').value.toLowerCase();
+            
+            const allData = [];
+            
+            // Get all items from localStorage that start with our prefix
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key.startsWith('dataApp_')) {
+                    try {
+                        const data = JSON.parse(localStorage.getItem(key));
+                        allData.push(data);
+                    } catch (error) {
+                        console.error('Error parsing data for key:', key);
+                    }
+                }
+            }
+            
+            // Filter data based on search term
+            const filteredData = allData.filter(item => 
+                item.key.toLowerCase().includes(searchTerm)
+            );
+            
+            // Sort by timestamp (newest first)
+            filteredData.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+            
+            if (filteredData.length === 0) {
+                dataList.innerHTML = '<div class="empty-state">No data stored yet. Start by adding some data above!</div>';
+                return;
+            }
+            
+            let html = '';
+            filteredData.forEach(item => {
+                const date = new Date(item.timestamp).toLocaleString();
+                html += `
+                    <div class="data-item">
+                        <div class="data-item-key">${escapeHtml(item.key)}</div>
+                        <div class="data-item-value">${escapeHtml(item.value)}</div>
+                        <div class="data-item-meta">
+                            Saved: ${date}
+                            <button class="delete-btn" onclick="deleteData('${escapeHtml(item.key)}')">Delete</button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            dataList.innerHTML = html;
+        }
+
+        // Delete specific data item
+        function deleteData(key) {
+            if (confirm(`Are you sure you want to delete the item with key: ${key}?`)) {
+                localStorage.removeItem('dataApp_' + key);
+                showMessage(`Data with key "${key}" deleted successfully`, 'success');
+                loadAllData();
+                updateStats();
+            }
+        }
+
+        // Filter data based on search
+        function filterData() {
+            loadAllData();
+        }
+
+        // Clear the form
+        function clearForm() {
+            document.getElementById('dataKey').value = '';
+            document.getElementById('dataValue').value = '';
+        }
+
+        // Update statistics
+        function updateStats() {
+            let count = 0;
+            let totalSize = 0;
+            
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key.startsWith('dataApp_')) {
+                    count++;
+                    const value = localStorage.getItem(key);
+                    totalSize += key.length + value.length;
+                }
+            }
+            
+            document.getElementById('totalItems').textContent = count;
+            document.getElementById('storageUsed').textContent = (totalSize / 1024).toFixed(2) + ' KB';
+        }
+
+        // Show message to user
+        function showMessage(message, type) {
+            const container = document.getElementById('message-container');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+            messageDiv.textContent = message;
+            
+            container.innerHTML = '';
+            container.appendChild(messageDiv);
+            
+            setTimeout(() => {
+                messageDiv.remove();
+            }, 5000);
+        }
+
+        // Escape HTML to prevent XSS
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Export data
+        function exportData() {
+            const allData = [];
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key.startsWith('dataApp_')) {
+                    const data = JSON.parse(localStorage.getItem(key));
+                    allData.push(data);
+                }
+            }
+            
+            const dataStr = JSON.stringify(allData, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'data-export-' + new Date().toISOString().split('T')[0] + '.json';
+            link.click();
+        }
+    </script>
+</body>
+</html>
