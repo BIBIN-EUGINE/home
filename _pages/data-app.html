@@ -223,8 +223,8 @@ author_profile: true
                     <textarea id="dataValue" name="dataValue" placeholder="Enter your data here..." required></textarea>
                 </div>
                 <button type="submit">Save Data</button>
-                <button type="button" class="clear-btn" onclick="clearForm()">Clear Form</button>
-                <button type="button" class="export-btn" onclick="exportData()">Export All Data</button>
+                <button type="button" class="clear-btn" id="clearFormBtn">Clear Form</button>
+                <button type="button" class="export-btn" id="exportDataBtn">Export All Data</button>
             </form>
         </div>
 
@@ -245,7 +245,7 @@ author_profile: true
         <div class="app-section">
             <h2>🔍 Retrieve Data</h2>
             <div class="search-box">
-                <input type="text" id="searchKey" placeholder="Search by key..." onkeyup="filterData()">
+                <input type="text" id="searchKey" placeholder="Search by key...">
             </div>
             <div id="dataList"></div>
         </div>
@@ -256,6 +256,11 @@ author_profile: true
         document.addEventListener('DOMContentLoaded', function() {
             loadAllData();
             updateStats();
+            
+            // Add event listeners for buttons
+            document.getElementById('clearFormBtn').addEventListener('click', clearForm);
+            document.getElementById('exportDataBtn').addEventListener('click', exportData);
+            document.getElementById('searchKey').addEventListener('keyup', filterData);
         });
 
         // Store data
