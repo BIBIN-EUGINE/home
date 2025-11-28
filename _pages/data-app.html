@@ -5,12 +5,7 @@ permalink: /data-app/
 author_profile: true
 ---
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
+<style>
         .data-app-container {
             max-width: 800px;
             margin: 20px auto;
@@ -206,10 +201,9 @@ author_profile: true
             color: #721c24;
             border: 1px solid #f5c6cb;
         }
-    </style>
-</head>
-<body>
-    <div class="data-app-container">
+</style>
+
+<div class="data-app-container">
         <div class="app-section">
             <h2>📝 Store Data</h2>
             <div id="message-container"></div>
@@ -294,7 +288,11 @@ author_profile: true
                 loadAllData();
                 updateStats();
             } catch (error) {
-                showMessage('Error saving data: ' + error.message, 'error');
+                if (error.name === 'QuotaExceededError') {
+                    showMessage('Storage quota exceeded! Please delete some items.', 'error');
+                } else {
+                    showMessage('Error saving data. Please try again.', 'error');
+                }
             }
         });
 
@@ -446,5 +444,4 @@ author_profile: true
             showMessage('Data exported successfully!', 'success');
         }
     </script>
-</body>
-</html>
+</div>
