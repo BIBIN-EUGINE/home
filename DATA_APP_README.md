@@ -110,7 +110,7 @@ The app is integrated as a Jekyll page:
 ## Future Enhancements
 
 Possible improvements:
-- Export/Import functionality
+- Import functionality (export is already implemented)
 - Data validation
 - Rich text editor
 - Data encryption
